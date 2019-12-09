@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Homepage</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	<style>
+		.form {
+			width: 500px;
+			border: 1px solid #ccc;
+		}
+		.formInput {
+			display: inline;
+		}
+		label {
+			width: 100px;
+		}
+		label.error {
+			display: block;
+			width: 100%;
+			margin-left: 110px;
+			color: red;
+			font-size: 14px;
+		}
+		p.error {
+			color: red;
+			font-size: 14px;
+			margin: 10px 0 5px 0;
+		}
+		ul {
+			list-style: none;
+			display: flex;
+			justify-content: center;
+		}
+		ul li {
+			width: 60px;
+			margin: 0 20px;
+		}
+		a {
+			color: #000;
+		}
+		a:hover {
+			text-decoration: none;
+		}
+		.ui-state-active a{
+			color: #fff;
+    		background-color: #007bff;
+   			border-color: #007bff;	
+   			padding: 5px 10px;
+   			border-radius: 3px;	
+   		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<div class="form mx-auto py-3" id="tabs">
+			<div class="action text-center">
+				<ul>
+					<li><a href="#tabs-1">Register</a></li>
+					<li><a href="#tabs-2">Login</a></li>
+				</ul>
+			</div>
+			<div id="tabs-1">
+				<form action="" class="ml-5" id="register">
+					<div class="w-100 mt-3">
+						<label for="userName" class="custom">User Name</label>
+						<input type="text" name="userName" class="form-control w-50 formInput" placeholder="User name">
+					</div>
+					<div class="w-100 mt-3">
+						<label for="password" class="custom">Password</label>
+						<input type="password" name="password" id="password" class="form-control w-50 formInput" placeholder="Password">
+					</div>
+					<div class="w-100 mt-3">
+						<label for="rePass" class="custom">Re-Password</label>
+						<input type="password" name="rePass" class="form-control w-50 formInput" placeholder="Password">
+					</div>
+					<div class="w-100 mt-3">
+						<label for="email" class="custom">Email</label>
+						<input type="email" name="email" class="form-control w-50 formInput" placeholder="Email">
+					</div>
+					<div class="w-100 text-center pr-5 mt-3" id="action">
+						<button type="submit" class="btn btn-primary">Register</button>
+						<button type="reset" class="btn btn-secondary">Cancel</button>
+						<p id="messages-1" class="text-danger"></p>
+					</div>
+				</form>
+			</div>
+			<div id="tabs-2">
+				<form action="" class="ml-5" id="login">
+					<div class="w-100 mt-3">
+						<label for="userName" class="custom">User Name</label>
+						<input type="text" name="userName" class="form-control w-50 formInput" placeholder="User name">
+					</div>
+					<div class="w-100 mt-3">
+						<label for="password" class="custom">Password</label>
+						<input type="password" name="password" class="form-control w-50 formInput" placeholder="Password">
+					</div>
+					<div class="w-100 text-center pr-5 mt-3">
+						<button type="submit" class="btn btn-success">Login</button>
+						<p id="messages-2" class="text-danger"></p>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+	<script src="jquery.validate.min.js"></script>
+	<script>
+		class User {
+			constructor(name, password, email) {
+				this.name = name,
+				this.password = password,
+				this.email = email
+			}
+			register = () => {
+				if(JSON.parse(localStorage.getItem(this.name))) return false;
+				else {
+					localStorage.setItem(this.name,JSON.stringify(this));
+					return true;
+				}
+			}
+			login = () => {
+				if(!JSON.parse(localStorage.getItem(this.name))) return;
+				else {
+					const user = JSON.parse(localStorage.getItem(this.name));
+					if(user.password !== this.password) return;
+					return true;
+				}
+			}
+		}
+		$(function() {
+			$("#tabs").tabs({active: 1});
+
+			$('#login').submit((e) => {
+				e.preventDefault();
+			}).validate({
+				rules: {
+					userName: {
+						required: true,
+						regExp: true
+					},
+					password: {
+						required: true,
+						regExp: true
+					}
+				},
+				messages: {
+					userName: {
+						required: 'This field is required!',
+						regExp: 'Please enter match format'
+					},
+					password: {
+						required: 'This field is required!',
+						regExp: 'Please enter match format'
+					}
+				},
+				submitHandler: function() {
+					const data = Array.from(this.currentElements).map(item => item.value);
+					const user = new User(...data);
+					if(user.login()) {
+						this.currentForm.reset();
+						alert('Login Successed');
+						$('#messages-2').empty();
+					}
+					else $('#messages-2').text('User or Password not valid!');
+				}
+			})
+
+			$('#register').submit((e) => {
+				e.preventDefault();
+			}).validate({
+				rules: {
+					userName: {
+						required: true,
+						regExp: true
+					},
+					password: {
+						required: true,
+						regExp: true
+					},
+					rePass: {
+						required: true,
+						equalTo: "#password"
+					},
+					email: {
+						required: true
+					}
+				},
+				messages: {
+					userName: {
+						required: 'This field is required!',
+						regExp: 'Please enter match format'
+					},
+					password: {
+						required: 'This field is required!',
+						regExp: 'Please enter match format'
+					},
+					rePass: {
+						required: 'This field is required!',
+						equalTo: 'Password not valid'
+					},
+					email: {
+						required: 'This field is required!',
+					}
+				},
+				submitHandler: function() {
+					const data = Array.from(this.currentElements).filter((_,index) => index !== 2).map(item => item.value);
+					const newUser = new User(...data); 
+					if(newUser.register()) {
+						this.currentForm.reset();
+						alert('Register successed!');
+						$('#messages-1').empty();
+					}
+					else {
+						$('#messages-1').text('User exists already!');
+					}
+				}
+			});
+			$.validator.addMethod('regExp', function(value) {
+				return /^[A-Za-z0-9]+$/.test(value);
+			});
+		});			
+  	</script>
+</body>
+</html>
